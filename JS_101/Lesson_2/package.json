@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "common-js": "^0.3.8",
+    "readline-sync": "^1.4.10"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "en": {
+    "welcome": "Welcome to Calculator! Please enter your name:",
+    "numOne":"What's the first number?", 
+    "numTwo":"What's the second number?", 
+    "operation":"What operation would you like to perform?\n1) Add 2) Subtract 3) Multiply 4) Divide", 
+    "runProgram":"Would you like to do another calculation? (y/n)"
+  },
+  "fr": {
+    "numOne":"Quel est le premier numéro?",
+    "numTwo": "Quel est le deuxième numéro?",
+    "operation":"Quelle opération voudriez-vous effectuer?\n1) Ajouter 2) Soustraire 3) Multiplier 4) Diviser",
+    "runProgram":"Voulez-vous faire un autre calcul? (o/n)"
+  },
+  "sp": {
+    "numOne": "¿Cuál es el primer número?",
+    "numTwo": "¿Cuál es el segundo número?",
+    "operation": "¿Qué operación le gustaría realizar?\n1) Sumar 2) Restar 3) Multiplicar 4) Dividir",
+    "runProgram": "¿Le gustaría hacer otro cálculo? (s/n)"
+  }
+}
+
+
