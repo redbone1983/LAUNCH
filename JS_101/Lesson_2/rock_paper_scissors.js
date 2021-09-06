@@ -3,25 +3,41 @@ const readline = require('readline-sync');
 
 let choices = '';
 
+// Set up game constants
 const VALID_CHOICES = [
   'r', 
   'p', 
   's'
 ];
 
-// Set up game constants
 const wins = [
   'sp',
   'pr',
   'rs'
 ];
+
 const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
-// Initialize level 1 variables
 
 const prompt = str => console.log(`==> ${str}`);
+let playGame = true;
+
+const displayWinner = (human, computer) => {
+  // Assign ordered choices to empty string
+  choices += human;
+  choices += computer;
+
+  if (wins.includes(choices)) {
+    return 'Human wins!';
+  } else if (human === computer) {
+    return 'You have tied!';
+  } 
+    
+return 'Computer wins!';
+  
+};
 
 // // Start Main Game Loop
-while (true) {
+while (playGame) {
 
   prompt('Please choose: p for paper, r for rock, s for scissors.');
   let humanChoice = readline.question();
@@ -38,17 +54,18 @@ while (true) {
 
   prompt(`You chose ${humanChoice}, computer chose ${computerChoice}`);
 
-  // Assign ordered choices to empty string
-  choices += humanChoice;
-  choices += computerChoice;
+  prompt(displayWinner(humanChoice, computerChoice));
 
-  if (wins.includes(choices)) {
-    prompt('Human wins!');
-  } else if (humanChoice === computerChoice) {
-    prompt('You have tied!');
-  } else {
-    prompt('Computer wins!');
+  prompt('Would you like to play again? (y/n)')
+  let answer = readline.question().toLowerCase();
+  
+  while (answer[0] !== 'n' && answer[0] !== 'y') {
+    prompt('Please enter "y" or "n".');
+    answer = readline.question().toLowerCase();
   }
 
-  break;
+  // eslint-disable-next-line curly
+  if (answer[0] !== 'y') {
+    playGame = false;
+  }
 }
