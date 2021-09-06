@@ -1,17 +1,54 @@
+/* eslint-disable no-console */
 const readline = require('readline-sync');
 
-/*
- * GAMES RULES
- * 1. If player a chooses rock and player b chooses scissors, player a wins.
- * 2. If player a chooses paper and player b chooses rock, player a wins.
- * 3. If player a chooses scissors and player b chooses paper, player a wins.
- * 4. If both players choose the same item, neither player wins. It's a tie.
- */
+let choices = '';
 
-// GAME FLOW
+const VALID_CHOICES = [
+  'r', 
+  'p', 
+  's'
+];
 
-/*
- * 1. The user makes a choice.
- * 2. The computer makes a choice.
- * 3. The winner is displayed.
- */
+// Set up game constants
+const wins = [
+  'sp',
+  'pr',
+  'rs'
+];
+const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
+// Initialize level 1 variables
+
+const prompt = str => console.log(`==> ${str}`);
+
+// // Start Main Game Loop
+while (true) {
+
+  prompt('Please choose: p for paper, r for rock, s for scissors.');
+  let humanChoice = readline.question();
+  let computerChoice = VALID_CHOICES[randomIndex];
+
+    // Start validation loop
+    while (true) {
+      if (VALID_CHOICES.includes(humanChoice)) {
+        break;
+      } else {
+        prompt("Please enter a valid input.");
+      }
+    }
+
+  prompt(`You chose ${humanChoice}, computer chose ${computerChoice}`);
+
+  // Assign ordered choices to empty string
+  choices += humanChoice;
+  choices += computerChoice;
+
+  if (wins.includes(choices)) {
+    prompt('Human wins!');
+  } else if (humanChoice === computerChoice) {
+    prompt('You have tied!');
+  } else {
+    prompt('Computer wins!');
+  }
+
+  break;
+}
