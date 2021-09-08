@@ -4,9 +4,14 @@ const readline = require('readline-sync');
 
 let choices = '';
 let gameCount = 1;
-let humanPoints = 0;
-let computerPoints = 0;
+// let humanPoints = 0;
+// let computerPoints = 0;
 let champion = false;
+
+let POINTS = {
+  "computer": 0,
+  "human": 0
+};
 
 // Set up game constants
 const VALID_CHOICES = [
@@ -17,38 +22,71 @@ const VALID_CHOICES = [
   'l'
 ];
 
-const wins = [
-  'sp',
-  'pr',
-  'rs',
-  'rl',
-  'sps',
-  'sl',
-  'lp',
-  'psp',
-  'spr'
-];
+const WINS = {
+  "lp": 'devours',
+  "lsp": 'poisons',
+  "pr": 'covers',
+  "psp": 'disproves',
+  "rl": 'crushes',
+  "rs": 'breaks',
+  "sl": 'decapitates',
+  "sp": 'cuts',
+  "spr": 'vaporizes',
+  "sps": 'smashes'
+};
 
+const WEAPONS = {
+  'l': 'lizard',
+  'p': 'paper',
+  'r': 'rock', 
+  's': 'scissor',
+  'sp': 'spock'
+};
+  
 const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
 
 const prompt = str => console.log(`==> ${str}`);
+
 let playGame = true;
 
-const displayWinner = (human, computer) => {
-  // Assign ordered choices to empty string
-  choices += human;
-  choices += computer;
+const tallyPoints = (obj, winner) => {
+  return obj[winner] += 1;
+};
 
-  if (human === computer) {
-    return 'IT IS A TIE!';
-  } else if (wins.includes(choices)) {
-    humanPoints += 1;
-    
-    return 'HUMAN WINS!';
-  } else if (!wins.includes(choices) && human !== computer && human !== 'x') {
-    computerPoints += 1;
-    
-    return 'COMPUTER WINS!';
+const reverseChoices = (choice1, choice2) => {
+  return choice2 += choice1;
+};
+
+const determineWinner = (player1, player2) => {
+  // Assign ordered choices to empty string
+  choices += player1;
+  choices += player2;
+  
+  if (player1 === player2) {
+    return 'tie';
+  } 
+  
+  if (Object.keys(WINS).includes(choices)) {
+    prompt(`${WEAPONS[player1]} ${WINS[choices]} ${WEAPONS[player2]}!`);
+    return 'human';
+  } 
+  
+  if (!Object.keys(WINS).includes(choices) && player1 !== player2 && player1 !== 'x') {
+    prompt(`${WEAPONS[player2]} ${WINS[reverseChoices(player1, player2)]} ${WEAPONS[player1]}`);
+    return 'computer';
+  }
+};
+
+const displayWinner = winner => {
+  switch (winner) {
+    case 'human': prompt('HUMAN WINS!');
+      break;
+    case 'computer': prompt('COMPUTER WINS!');
+      break;
+    case 'tie': prompt('IT IS A TIE.');
+      break;
+    default: 
+      break;
   }
 };
 
@@ -81,7 +119,7 @@ while (playGame) {
         console.clear();
         break;
       } else {
-        prompt("Please enter a valid input.");
+        prompt('Please choose: r for rock, p for paper, s for scissors, sp for spock, l for lizard or x to exit game.');
         humanChoice = readline.question().toLowerCase();
       }
   }
@@ -89,21 +127,30 @@ while (playGame) {
   prompt(`You chose ${humanChoice}, computer chose ${computerChoice}`);
 
   prompt('*******************************************');
-  prompt(displayWinner(humanChoice, computerChoice));
+  let currentWinner = determineWinner(humanChoice, computerChoice);
+  displayWinner(currentWinner);
+  tallyPoints(POINTS, currentWinner);
+  
+  // Reset choices
   choices = '';
+  let gameState = 'Current';
 
-  if (gameCount === 6 && humanPoints > computerPoints) {
+  if (gameCount === 6 && POINTS.human > POINTS.computer) {
     champion = true;
+    prompt('*******************************************');
     prompt("Human reigns supreme!");
     gameCount = 1;
-  } else if (gameCount === 6 && computerPoints > humanPoints) {
+    gameState = 'FINAL';
+  } else if (gameCount === 6 && POINTS.computer > POINTS.human) {
     champion = true;
+    prompt('*******************************************');
     prompt("Computer reigns supreme!");
     gameCount = 1;
+    gameState = 'FINAL';
   } 
 
   prompt('*******************************************');
-  prompt(`Current Score is You: ${humanPoints} & Computer: ${computerPoints}.`);
+  prompt(`${gameState} Score is HUMAN: ${POINTS.human} & COMPUTER: ${POINTS.computer}.`);
   prompt('*******************************************');
 
   
@@ -111,15 +158,16 @@ while (playGame) {
     prompt('Would you like to play again? (y/n)');
     let answer = readline.question().toLowerCase();
 
-    while (answer[0] !== 'n' && answer[0] !== 'y') {
+    while (answer[0] !== 'n' && answer[0] !== 'y' && answer[0] !== 'x') {
       prompt('Please enter "y" or "n".');
       answer = readline.question().toLowerCase();
     }
 
     if (answer[0] === 'y') {
       champion = false;
-      humanPoints = 0;
-      computerPoints = 0;
+      POINTS.human = 0;
+      POINTS.computer = 0;
+      console.clear();
     } else {
       playGame = false;
     }
