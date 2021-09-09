@@ -1,16 +1,24 @@
-/* eslint-disable no-useless-catch */
 /* eslint-disable no-console */
+// Keep your functions simple; they should perform one logical task — no more, no less.
+
 const readline = require('readline-sync');
 
-let choices = '';
-let gameCount = 1;
-// let humanPoints = 0;
-// let computerPoints = 0;
-let champion = false;
+const GAME = {
+  "champion": false,
+  "choices": '',
+  "count": 1,
+  "play": true,
+  "state": 'Current'
+};
 
-let POINTS = {
-  "computer": 0,
-  "human": 0
+const HUMAN = {
+  "choice": '',
+  "score": 0
+};
+
+const COMPUTER = {
+  "choice": '',
+  "score": 0
 };
 
 // Set up game constants
@@ -43,45 +51,80 @@ const WEAPONS = {
   'sp': 'spock'
 };
   
-const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
+// const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
 
 const prompt = str => console.log(`==> ${str}`);
 
-let playGame = true;
-
-const tallyPoints = (obj, winner) => {
-  return obj[winner] += 1;
+const TALLY_SCORE = winner => {
+  winner.score += 1;
+  return winner;
 };
 
-const reverseChoices = (choice1, choice2) => {
-  return choice2 += choice1;
+const reset_round = () => {
+  HUMAN.choice = '';
+  COMPUTER.choice = '';
+  GAME.choices = '';
 };
 
-const determineWinner = (player1, player2) => {
-  // Assign ordered choices to empty string
-  choices += player1;
-  choices += player2;
+const RESET_GAME = () => {
+  GAME.play = true;
+  GAME.count = 1;
+  GAME.champion = false;
+  GAME.state = 'Current';
+  HUMAN.choice = '';
+  HUMAN.score = 0;
+  COMPUTER.choice = '';
+  COMPUTER.score = 0;
+};
+
+
+const REVERSE_CHOICES = (choice1, choice2) => {
+  GAME.choices = choice2;
+  GAME.choices += choice1;
+
+  return GAME.choices;
+};
+
+const HUMAN_CHOICE = () => {
+  prompt('Please choose: r for rock, p for paper, s for scissors, sp for spock, l for lizard or x to exit game.');
+  HUMAN.choice = readline.question().toLowerCase();
+  console.clear();
   
-  if (player1 === player2) {
+  return HUMAN.choice;
+};
+
+const COMPUTER_CHOICE = () => {
+  let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
+  COMPUTER.choice = VALID_CHOICES[randomIndex];
+  console.clear();
+
+  return COMPUTER.choice;
+};
+
+const DETERMINE_WINNER = (humanChoice, compChoice) => {
+  // Assign ordered choices to empty string
+  GAME.choices += humanChoice;
+  GAME.choices += compChoice;
+  
+  if (humanChoice === compChoice) {
     return 'tie';
   } 
   
-  if (Object.keys(WINS).includes(choices)) {
-    prompt(`${WEAPONS[player1]} ${WINS[choices]} ${WEAPONS[player2]}!`);
-    return 'human';
+  if (Object.keys(WINS).includes(GAME.choices)) {
+    return HUMAN;
   } 
   
-  if (!Object.keys(WINS).includes(choices) && player1 !== player2 && player1 !== 'x') {
-    prompt(`${WEAPONS[player2]} ${WINS[reverseChoices(player1, player2)]} ${WEAPONS[player1]}`);
-    return 'computer';
+  if (!Object.keys(WINS).includes(GAME.choices) && humanChoice !== compChoice && humanChoice !== 'x') {
+    return COMPUTER;
   }
 };
 
-const displayWinner = winner => {
+const DISPLAY_WINNER = winner => {
   switch (winner) {
-    case 'human': prompt('HUMAN WINS!');
+    case HUMAN: prompt(`${WEAPONS[HUMAN.choice]} ${WINS[GAME.choices]} ${WEAPONS[COMPUTER.choice]}!`);
       break;
-    case 'computer': prompt('COMPUTER WINS!');
+    case COMPUTER: prompt(`${WEAPONS[COMPUTER.choice]} ${WINS[REVERSE_CHOICES(HUMAN.choice, COMPUTER.choice)]} ${WEAPONS[HUMAN.choice]}`);
+      console.log(`REVERSE_CHOICES returns: ${REVERSE_CHOICES(HUMAN.choice, COMPUTER.choice)}`);
       break;
     case 'tie': prompt('IT IS A TIE.');
       break;
@@ -92,69 +135,66 @@ const displayWinner = winner => {
 
 let greeting = '*******************************************\nWELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!\n*******************************************\nBest out of 5 games is crowned Champion!\n*******************************************';
 
-const gameGreeting = msg => console.log(msg);
+const GAME_GREETING = msg => console.log(msg);
 
 // // Start Main Game Loop
-while (playGame) {
-  if (gameCount === 1) {
-    gameGreeting(greeting);
+while (GAME.play) {
+  reset_round();
+  if (GAME.count === 1) {
+    GAME_GREETING(greeting);
   }
 
-  prompt(`GAME ${gameCount} STARTS NOW`);
+  prompt(`GAME ${GAME.count} STARTS NOW`);
   prompt('*******************************************');
-  prompt('Please choose: r for rock, p for paper, s for scissors, sp for spock, l for lizard or x to exit game.');
   
-  let humanChoice = readline.question().toLowerCase();
-  let computerChoice = VALID_CHOICES[randomIndex];
+  let human = HUMAN_CHOICE();
+  let computer = COMPUTER_CHOICE();
   console.clear();
-
-  if (humanChoice.toLowerCase() === 'x') {
+  
+  if (human.toLowerCase() === 'x') {
     break;
   }
 
     // Start validation loop
     while (true) {
-      if (VALID_CHOICES.includes(humanChoice)) {
-        gameCount += 1;
+      if (VALID_CHOICES.includes(human)) {
+        GAME.count += 1;
         console.clear();
         break;
       } else {
-        prompt('Please choose: r for rock, p for paper, s for scissors, sp for spock, l for lizard or x to exit game.');
-        humanChoice = readline.question().toLowerCase();
+        human = HUMAN_CHOICE();
       }
   }
   
-  prompt(`You chose ${humanChoice}, computer chose ${computerChoice}`);
+  prompt(`You chose ${human}, computer chose ${computer}`);
 
   prompt('*******************************************');
-  let currentWinner = determineWinner(humanChoice, computerChoice);
-  displayWinner(currentWinner);
-  tallyPoints(POINTS, currentWinner);
+  let currentWinner = DETERMINE_WINNER(human, computer);
+  DISPLAY_WINNER(currentWinner);
+  TALLY_SCORE(currentWinner);
   
-  // Reset choices
-  choices = '';
-  let gameState = 'Current';
+  reset_round();
 
-  if (gameCount === 6 && POINTS.human > POINTS.computer) {
-    champion = true;
+  if (GAME.count >= 6 && HUMAN.score > COMPUTER.score) {
+    GAME.champion = true;
     prompt('*******************************************');
     prompt("Human reigns supreme!");
-    gameCount = 1;
-    gameState = 'FINAL';
-  } else if (gameCount === 6 && POINTS.computer > POINTS.human) {
-    champion = true;
+    GAME.count = 1;
+    GAME.state = 'FINAL';
+  } else if (GAME.count >= 6 && COMPUTER.score > HUMAN.score) {
+    GAME.champion = true;
     prompt('*******************************************');
     prompt("Computer reigns supreme!");
-    gameCount = 1;
-    gameState = 'FINAL';
+    GAME.count = 1;
+    GAME.state = 'FINAL';
   } 
 
   prompt('*******************************************');
-  prompt(`${gameState} Score is HUMAN: ${POINTS.human} & COMPUTER: ${POINTS.computer}.`);
+  prompt(`${GAME.state} Score is HUMAN: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
   prompt('*******************************************');
 
   
-  if (champion) {
+  if (GAME.champion) {
     prompt('Would you like to play again? (y/n)');
     let answer = readline.question().toLowerCase();
 
@@ -164,12 +204,10 @@ while (playGame) {
     }
 
     if (answer[0] === 'y') {
-      champion = false;
-      POINTS.human = 0;
-      POINTS.computer = 0;
+      RESET_GAME();
       console.clear();
     } else {
-      playGame = false;
+      GAME.play = false;
     }
   } 
 }
