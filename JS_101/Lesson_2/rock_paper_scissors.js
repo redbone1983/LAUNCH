@@ -55,7 +55,7 @@ const WEAPONS = {
   
 const randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
 
-const prompt = str => console.log(`==> ${str}`);
+const prompt = str => console.log(`${str}\n----------------------------------------`);
 
 const resetRound = () => {
 
@@ -131,17 +131,27 @@ const displayWinner = winner => {
   }
 };
 
-let greeting = '-----------------------------------------\nWELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!\n-----------------------------------------\nBest out of 5 games is crowned Champion!\n-----------------------------------------';
+let greeting = `WELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!\n-----------------------------------------\n\nBest out of 5 games is crowned Champion!\n`;
+
+const getName = () => {
+  prompt(`Please enter your name.`);
+  HUMAN.name = readline.question();
+  console.clear();
+
+  return HUMAN.name;
+};
 
 // // Start Main Game Loop
 while (GAME.play) {
   resetRound();
+
   if (GAME.count === 1) {
+    let humanName = getName();
+    prompt(`Hi, ${humanName}!`);
     prompt(greeting);
   }
 
   prompt(`GAME ${GAME.count} STARTS NOW`);
-  prompt('*******************************************');
   
   let human = humanChoice();
   let computer = computerChoice(randomIndex);
@@ -164,32 +174,27 @@ while (GAME.play) {
   
   prompt(`You chose ${WEAPONS[human]}, computer chose ${WEAPONS[computer]}`);
 
-  prompt('*******************************************');
   let currentWinner = determineWinner(human, computer);
   displayWinner(currentWinner);
   currentWinner.score += 1;
+
+  if (currentWinner !== 'tie' && GAME.count < 5) {
+    prompt(`${currentWinner.name} WINS THIS ROUND!`);
+  } 
   
   resetRound();
 
-  if (HUMAN.score >= COMPUTER.score || COMPUTER.score >= HUMAN.score) {
-    GAME.champion = true;
-
-    if (currentWinner !== 'tie' && GAME.count <= 5) {
-      prompt('-----------------------------------------');
-      prompt(`${currentWinner.name} WINS THIS ROUND!`);
+    if (GAME.count > 5 && HUMAN.score !== COMPUTER.score) {
+      GAME.champion = true;
     }
-   
-    if (GAME.count > 5 && GAME.champion) {
+    
+    if (GAME.champion) {
       GAME.state = 'FINAL';
-      prompt('-----------------------------------------');
       prompt(`${currentWinner.name} IS THE CHAMPION!`);
     } 
 
-    prompt('-----------------------------------------');
-    prompt(`${GAME.state} Score is HUMAN: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
-    prompt('*******************************************');
-  }
-
+    prompt(`${GAME.state} Score is ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
+  
   if (GAME.state === 'FINAL') {
     prompt('Would you like to play again? (y/n)');
     let answer = readline.question().toLowerCase();
