@@ -1,11 +1,10 @@
 /* eslint-disable no-console */
 // Keep your functions simple; they should perform one logical task — no more, no less.
-
 const readline = require('readline-sync');
 
 // Set up game constants
 const GAME = {
-  "champion": false,
+  "champion": '',
   "choices": '',
   "count": 1,
   "play": true,
@@ -13,12 +12,14 @@ const GAME = {
 };
 
 const HUMAN = {
+  "champion": false,
   "choice": '',
   "name": 'HUMAN',
   "score": 0
 };
 
 const COMPUTER = {
+  "champion": false,
   "choice": '',
   "name": 'COMPUTER',
   "score": 0
@@ -33,29 +34,29 @@ const VALID_CHOICES = [
 ];
 
 const WINS = {
-  "lp": 'devours',
-  "lsp": 'poisons',
-  "pr": 'covers',
-  "psp": 'disproves',
-  "rl": 'crushes',
-  "rs": 'breaks',
-  "sl": 'decapitates',
-  "sp": 'cuts',
-  "spr": 'vaporizes',
-  "sps": 'smashes'
+  "lp": 'DEVOURS',
+  "lsp": 'POISONS',
+  "pr": 'COVERS',
+  "psp": 'DISPROVES',
+  "rl": 'CRUSHES',
+  "rs": 'BREAKS',
+  "sl": 'DECAPITATES',
+  "sp": 'CUTS',
+  "spr": 'VAPORIZES',
+  "sps": 'SMASHES'
 };
 
 const WEAPONS = {
-  'l': 'lizard',
-  'p': 'paper',
-  'r': 'rock', 
-  's': 'scissor',
-  'sp': 'spock'
+  'l': 'LIZARD',
+  'p': 'PAPER',
+  'r': 'ROCK', 
+  's': 'SCISSORS',
+  'sp': 'SPOCK'
 };
   
-const prompt = str => console.log(`${str}\n----------------------------------------`);
+const prompt = str => console.log(`----------------------------------------\n${str}\n----------------------------------------`);
 
-const resetRound = () => {
+const resetChoices = () => {
   GAME.choices = '';
   HUMAN.choice = '';
   COMPUTER.choice = '';
@@ -63,17 +64,16 @@ const resetRound = () => {
 
 const resetGame = () => {
   GAME.play = true;
+  GAME.champion = '';
   GAME.count = 1;
-  GAME.champion = false;
   GAME.state = 'Current';
   console.clear();
 };
 
 const resetPlayer = player => {
+  player.champion = false;
   player.choice = '';
   player.score = 0;
-
-  return player;
 };
 
 const reverseChoices = (choice1, choice2) => {
@@ -84,8 +84,8 @@ const reverseChoices = (choice1, choice2) => {
 };
 
 const getName = () => {
-  prompt(`\n----------------------------------------\nPLEASE ENTER YOUR NAME.`);
-  HUMAN.name = readline.question();
+  prompt(`PLEASE ENTER YOUR NAME.`);
+  HUMAN.name = readline.question().toUpperCase();
   console.clear();
 
   return HUMAN.name;
@@ -107,60 +107,54 @@ const getComputerChoice = () => {
   return COMPUTER.choice;
 };
 
+// eslint-disable-next-line consistent-return
 const determineWinner = (player1, player2) => {
   GAME.choices += player1;
   GAME.choices += player2;
-  let gameResults = null;
-  
+
   if (player1 === player2) {
-    gameResults = 'tie';
+    return 'tie';
   } 
   
   if (Object.keys(WINS).includes(GAME.choices)) {
-    gameResults = HUMAN;
+    return HUMAN;
   } 
   
   if (!Object.keys(WINS).includes(GAME.choices) && player1 !== player2 && player1 !== 'x') {
-    gameResults = COMPUTER;
-  }
-
-  return gameResults;
+    return COMPUTER;
+  } 
 };
 
 const displayWinner = winner => {
-  let winnerMessage = '';
   switch (winner) {
     case HUMAN: 
-      winnerMessage = `${WEAPONS[HUMAN.choice]} ${WINS[GAME.choices]} ${WEAPONS[COMPUTER.choice]}!`;
-      break;
+      return prompt(`${WEAPONS[HUMAN.choice]} ${WINS[GAME.choices]} ${WEAPONS[COMPUTER.choice]}!`);
     case COMPUTER: 
-      winnerMessage = `${WEAPONS[COMPUTER.choice]} ${WINS[reverseChoices(HUMAN.choice, COMPUTER.choice)]} ${WEAPONS[HUMAN.choice]}`;
-      break;
+      return prompt(`${WEAPONS[COMPUTER.choice]} ${WINS[reverseChoices(HUMAN.choice, COMPUTER.choice)]} ${WEAPONS[HUMAN.choice]}`);
     case 'tie': 
-      winnerMessage = 'IT IS A TIE.';
-      break;
+      return prompt('IT IS A TIE.');
     default: 
       break;
   }
-
-  prompt(winnerMessage);
 };
 
+// eslint-disable-next-line no-return-assign
 const tallyScore = player => player.score += 1;
 
-let greeting = `WELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!\n-----------------------------------------\nBEST OUT OF 5 IS CROWNED CHAMPION!`;
+let greeting = `WELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!`;
+let rules = `BEST OUT OF 5 IS CROWNED CHAMPION!`;
 
 let continueGame = false;
 
 // Start Main Game Loop
 while (GAME.play) {
-  let humanName = '';
-  resetRound();
+  resetChoices();
 
   if (GAME.count === 1 && continueGame !== true) {
-    humanName = getName();
-    prompt(`Hi, ${humanName}!`);
+    getName();
+    prompt(`Hi, ${HUMAN.name}!`);
     prompt(greeting);
+    prompt(rules);
   } 
 
   prompt(`GAME ${GAME.count} STARTS NOW`);
@@ -173,41 +167,42 @@ while (GAME.play) {
     break;
   }
 
-    // Start validation loop
-    while (true) {
-      if (VALID_CHOICES.includes(human)) {
-        GAME.count += 1;
-        console.clear();
-        break; 
-      } else {
-        human = getHumanChoice();
-      }
-    } 
+  // Start validation loop
+  while (true) {
+    if (VALID_CHOICES.includes(human)) {
+      GAME.count += 1;
+      console.clear();
+      break; 
+    } else {
+      human = getHumanChoice();
+    }
+  } 
  
-  prompt(`You chose ${WEAPONS[human]}, computer chose ${WEAPONS[computer]}`);
+  prompt(`YOU CHOSE ${WEAPONS[human]}. COMPUTER CHOSE ${WEAPONS[computer]}.`);
 
   let currentWinner = determineWinner(human, computer);
-  displayWinner(currentWinner);
   tallyScore(currentWinner);
-  
-  if (currentWinner !== 'tie' && GAME.champion === false) {
+  displayWinner(currentWinner);
+    
+  if (currentWinner !== 'tie' && !GAME.champion) {
     prompt(`${currentWinner.name} WINS ROUND ${GAME.count - 1}!`);
   } 
 
-  resetRound();
+  resetChoices();
 
-  prompt(`${GAME.state} Score is ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
+  prompt(`${GAME.state} SCORE IS ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
 
-    if (GAME.count > 5 && HUMAN.score !== COMPUTER.score) {
-      GAME.champion = true;
+  if (GAME.count > 5 && HUMAN.score !== COMPUTER.score) {
+    if (HUMAN.score > COMPUTER.score) {
+      GAME.champion = HUMAN.name;
+    } else if (COMPUTER.score > HUMAN.score) {
+      GAME.champion = COMPUTER.name;
     }
-    
-    if (GAME.champion) {
-      GAME.state = 'FINAL';
-      prompt(`${currentWinner.name} IS THE CHAMPION!`);
-    } 
+  }
 
-    if (GAME.state === 'FINAL') {
+  if (GAME.champion) {
+    GAME.state = 'FINAL';
+    prompt(`${GAME.champion} IS THE CHAMPION!`);
     prompt('Would you like to play again? (y/n)');
     let answer = readline.question().toLowerCase();
   
@@ -226,3 +221,6 @@ while (GAME.play) {
     }
   }
 }
+
+console.clear();
+prompt(`Thanks for playing ROCK, PAPER, SCISSORS, SPOCK, LIZARD ${HUMAN.name}! GOODBYE!`);
