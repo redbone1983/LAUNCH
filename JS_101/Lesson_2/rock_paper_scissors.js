@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 /* eslint-disable no-console */
 
-import {keyInYNStrict, question} from 'readline-sync';
+const readline = require('readline-sync');
 
 const GAME = {
   "champion": '',
@@ -85,7 +85,7 @@ const reverseChoices = (choice1, choice2) => {
 
 const getName = () => {
   prompt(`PLEASE ENTER YOUR NAME.`);
-  HUMAN.name = question().toUpperCase();
+  HUMAN.name = readline.question().toUpperCase();
   console.clear();
 
   return HUMAN.name;
@@ -93,7 +93,7 @@ const getName = () => {
 
 const getHumanChoice = () => {
   prompt(`Please choose: "r" for ROCK, "p" for PAPER, "s" for SCISSORS, "sp" for SPOCK, "l" for LIZARD.`);
-  HUMAN.choice = question().toLowerCase();
+  HUMAN.choice = readline.question().toLowerCase();
   console.clear();
   
   return HUMAN.choice;
@@ -158,7 +158,7 @@ while (GAME.play) {
     prompt(greeting);
     prompt(shortRules);
 
-    if (keyInYNStrict(`${gameRulesPrompt}`)){
+    if (readline.keyInYNStrict(`${gameRulesPrompt}`)){
       console.clear();
       prompt(`${longRules}`);
     } else {
@@ -185,34 +185,36 @@ while (GAME.play) {
   prompt(`YOU CHOSE ${WEAPONS[human]}. COMPUTER CHOSE ${WEAPONS[computer]}.`);
 
   let currentWinner = determineWinner(human, computer);
-  tallyScore(currentWinner);
+  if (currentWinner !== 'tie') {
+    tallyScore(currentWinner);
+  }
+
   displayWinner(currentWinner);
-    
+
   if (currentWinner !== 'tie' && !GAME.champion) {
     prompt(`${currentWinner.name} WINS ROUND ${GAME.count - 1}!`);
   } 
 
   resetChoices();
 
-  prompt(`${GAME.state} SCORE IS ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
-
-  if (GAME.count > 5 && HUMAN.score !== COMPUTER.score) {
+  if (GAME.count > 5 && HUMAN.score !== COMPUTER.score && currentWinner !== 'tie') {
     if (HUMAN.score > COMPUTER.score) {
       GAME.champion = HUMAN.name;
     } else if (COMPUTER.score > HUMAN.score) {
       GAME.champion = COMPUTER.name;
-    }
+    } 
   }
 
   if (GAME.champion) {
     GAME.state = 'FINAL';
+    prompt(`${GAME.state} SCORE IS ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
     prompt(`${GAME.champion} IS THE CHAMPION!`);
     prompt('Would you like to play again? (y/n)');
-    let answer = question().toLowerCase();
+    let answer = readline.question().toLowerCase();
   
     while (answer[0] !== 'n' && answer[0] !== 'y') {
       prompt('Please enter "y" or "n"');
-      answer = question().toLowerCase();
+      answer = readline.question().toLowerCase();
     }
     
     if (answer[0] === 'y') {
@@ -224,6 +226,8 @@ while (GAME.play) {
       GAME.play = false;
     }
   }
+
+  prompt(`${GAME.state} SCORE IS ${HUMAN.name}: ${HUMAN.score} & COMPUTER: ${COMPUTER.score}.`);
 }
 
 console.clear();
