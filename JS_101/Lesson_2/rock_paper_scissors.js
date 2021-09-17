@@ -1,8 +1,8 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable no-console */
-// Keep your functions simple; they should perform one logical task — no more, no less.
-const readline = require('readline-sync');
 
-// Set up game constants
+import {keyInYNStrict, question} from 'readline-sync';
+
 const GAME = {
   "champion": '',
   "choices": '',
@@ -53,7 +53,7 @@ const WEAPONS = {
   's': 'SCISSORS',
   'sp': 'SPOCK'
 };
-  
+
 const prompt = str => console.log(`----------------------------------------\n${str}\n----------------------------------------`);
 
 const resetChoices = () => {
@@ -85,7 +85,7 @@ const reverseChoices = (choice1, choice2) => {
 
 const getName = () => {
   prompt(`PLEASE ENTER YOUR NAME.`);
-  HUMAN.name = readline.question().toUpperCase();
+  HUMAN.name = question().toUpperCase();
   console.clear();
 
   return HUMAN.name;
@@ -93,7 +93,7 @@ const getName = () => {
 
 const getHumanChoice = () => {
   prompt(`Please choose: "r" for ROCK, "p" for PAPER, "s" for SCISSORS, "sp" for SPOCK, "l" for LIZARD.`);
-  HUMAN.choice = readline.question().toLowerCase();
+  HUMAN.choice = question().toLowerCase();
   console.clear();
   
   return HUMAN.choice;
@@ -120,7 +120,7 @@ const determineWinner = (player1, player2) => {
     return HUMAN;
   } 
   
-  if (!Object.keys(WINS).includes(GAME.choices) && player1 !== player2 && player1 !== 'x') {
+  if (!Object.keys(WINS).includes(GAME.choices) && player1 !== player2) {
     return COMPUTER;
   } 
 };
@@ -144,14 +144,12 @@ const tallyScore = player => player.score += 1;
 let greeting = `WELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!`;
 let shortRules = `BEST OUT OF 5 ROUNDS IS CROWNED CHAMPION!`;
 let gameRulesPrompt = `Press "Y" for game rules. Press "N" to continue game.`;
-let continuePlayingPrompt = `To Continue press "Y". Press "N" to exit game.`;
 let longRules = ` SCISSORS CUTS PAPER\n PAPER COVERS ROCK\n ROCK CRUSHES LIZARD\n LIZARD POISONS SPOCK\n SPOCK SMASHES SCISSORS\n SCISSORS DECAPITATES LIZARD\n LIZARD EATS PAPER\n PAPER DISPROVES SPOCK\n SPOCK VAPORIZES ROCK\n ROCK CRUSHES SCISSORS`;
 
 let continueGame = false;
 
 // Start Main Game Loop
 while (GAME.play) {
-  
   resetChoices();
 
   if (GAME.count === 1 && !continueGame) {
@@ -160,7 +158,7 @@ while (GAME.play) {
     prompt(greeting);
     prompt(shortRules);
 
-    if (readline.keyInYNStrict(`${gameRulesPrompt}`)){
+    if (keyInYNStrict(`${gameRulesPrompt}`)){
       console.clear();
       prompt(`${longRules}`);
     } else {
@@ -210,11 +208,11 @@ while (GAME.play) {
     GAME.state = 'FINAL';
     prompt(`${GAME.champion} IS THE CHAMPION!`);
     prompt('Would you like to play again? (y/n)');
-    let answer = readline.question().toLowerCase();
+    let answer = question().toLowerCase();
   
-    while (answer[0] !== 'n' && answer[0] !== 'y' && answer[0] !== 'x') {
+    while (answer[0] !== 'n' && answer[0] !== 'y') {
       prompt('Please enter "y" or "n"');
-      answer = readline.question().toLowerCase();
+      answer = question().toLowerCase();
     }
     
     if (answer[0] === 'y') {
