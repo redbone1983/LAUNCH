@@ -92,7 +92,7 @@ const getName = () => {
 };
 
 const getHumanChoice = () => {
-  prompt(`Please choose: "r" for ROCK, "p" for PAPER, "s" for SCISSORS, "sp" for SPOCK, "l" for LIZARD or "x" to EXIT GAME.`);
+  prompt(`Please choose: "r" for ROCK, "p" for PAPER, "s" for SCISSORS, "sp" for SPOCK, "l" for LIZARD.`);
   HUMAN.choice = readline.question().toLowerCase();
   console.clear();
   
@@ -142,30 +142,36 @@ const displayWinner = winner => {
 const tallyScore = player => player.score += 1;
 
 let greeting = `WELCOME TO ROCK, PAPER, SCISSORS, SPOCK, LIZARD!`;
-let rules = `BEST OUT OF 5 IS CROWNED CHAMPION!`;
+let shortRules = `BEST OUT OF 5 ROUNDS IS CROWNED CHAMPION!`;
+let gameRulesPrompt = `Press "Y" for game rules. Press "N" to continue game.`;
+let continuePlayingPrompt = `To Continue press "Y". Press "N" to exit game.`;
+let longRules = ` SCISSORS CUTS PAPER\n PAPER COVERS ROCK\n ROCK CRUSHES LIZARD\n LIZARD POISONS SPOCK\n SPOCK SMASHES SCISSORS\n SCISSORS DECAPITATES LIZARD\n LIZARD EATS PAPER\n PAPER DISPROVES SPOCK\n SPOCK VAPORIZES ROCK\n ROCK CRUSHES SCISSORS`;
 
 let continueGame = false;
 
 // Start Main Game Loop
 while (GAME.play) {
+  
   resetChoices();
 
-  if (GAME.count === 1 && continueGame !== true) {
+  if (GAME.count === 1 && !continueGame) {
     getName();
     prompt(`Hi, ${HUMAN.name}!`);
     prompt(greeting);
-    prompt(rules);
-  } 
+    prompt(shortRules);
 
-  prompt(`GAME ${GAME.count} STARTS NOW`);
+    if (readline.keyInYNStrict(`${gameRulesPrompt}`)){
+      console.clear();
+      prompt(`${longRules}`);
+    } else {
+      console.clear();
+      prompt(`GAME ${GAME.count} STARTS NOW`);
+    } 
+  }  
   
   let human = getHumanChoice();
   let computer = getComputerChoice();
   console.clear();
-  
-  if (human.toLowerCase() === 'x') {
-    break;
-  }
 
   // Start validation loop
   while (true) {

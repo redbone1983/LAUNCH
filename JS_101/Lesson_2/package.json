@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "common-js": "^0.3.8",
+    "keycode": "github:timoxley/keycode",
     "readline-sync": "^1.4.10"
   }
 }
